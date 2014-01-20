@@ -1,12 +1,12 @@
 biblegateway-to-OSIS
 ====================
 
-Tools for retrieving bibles from biblegateway.com for use in AndBible
+Tools for retrieving bibles from biblegateway.com for use in <a href="https://github.com/mjdenham/and-bible">AndBible</a>
 
 The "scraper" tool is a Java app which will retrieve a bible translation for biblegateway.com and save it as an XML file
 in OSIS format.
 
-The "build" script will run a tool called osis2mod, which is part of the Sword project, to convert the OSIS file into 
+The "build" script will run a tool called osis2mod, which is part of the <a href="http://www.crosswire.org/sword/">Sword</a> project, to convert the OSIS file into 
 zText format, which is what AndBible can use.
 
 You will need to retrieve a copy of the Sword Utilities from 
@@ -21,4 +21,4 @@ who would desparately like to get translations like the NASB, NIV, NKJV, etc int
 
 You'll need to do a bit of fiddling to get this all working, but hopefully it's easy enough.
 
-P.S. I highly recommend using a caching tool at first, to allow you to aggressively cache the app's requests to biblegateway.com so that you don't inundate them with requests over and over again while you try to get it working. I used Polipo. Use the relaxTransparency = yes option to always return a hit from the cache when the data is present.
+P.S. I highly recommend using a caching tool at first, to allow you to aggressively cache the app's requests to biblegateway.com so that you don't inundate them with requests over and over again while you try to get it working. I used <a href="http://www.pps.univ-paris-diderot.fr/~jch/software/polipo/">Polipo</a>. Use the relaxTransparency = yes option to always return a hit from the cache when the data is present.

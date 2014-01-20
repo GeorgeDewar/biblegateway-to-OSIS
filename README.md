@@ -14,7 +14,7 @@ http://crosswire.org/ftpmirror/pub/sword/utils/win32/sword-utilities-1.6.2.zip. 
 that actually work on Windows. You may have an easier time on Linux.
 
 The "push" script will helpfully copy a finished package into the correct location on your phone, if it is plugged in 
-and AndBible is installed.
+and AndBible is installed. It requires a <translation name>.conf file for AndBible's use, an example of which (NASB.conf) is included.
 
 This could all be rewritten as a web application, which I might well do some time, but I hope it may be helpful to anyone 
 who would desparately like to get translations like the NASB, NIV, NKJV, etc into AndBible.

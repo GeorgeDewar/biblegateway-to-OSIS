@@ -22,3 +22,5 @@ who would desparately like to get translations like the NASB, NIV, NKJV, etc int
 You'll need to do a bit of fiddling to get this all working, but hopefully it's easy enough.
 
 P.S. I highly recommend using a caching tool at first, to allow you to aggressively cache the app's requests to biblegateway.com so that you don't inundate them with requests over and over again while you try to get it working. I used <a href="http://www.pps.univ-paris-diderot.fr/~jch/software/polipo/">Polipo</a>. Use the relaxTransparency = yes option to always return a hit from the cache when the data is present.
+
+<b>Disclaimer:</b> I have no affiliation with biblegateway.com, Sword, or AndBible. I am not aware of any terms of service that biblegateway.com have which forbids scraping, but use this software at your own risk. Please consider the relevant copyright issues. I strongly recommend that you only use the resulting Bible texts for personal use. It is worth noting, however, that this is the same mechanism that other Bible apps on the Play store, such as LiveBible, use to retrieve Bible text for offline use.

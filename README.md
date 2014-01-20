@@ -21,4 +21,4 @@ who would desparately like to get translations like the NASB, NIV, NKJV, etc int
 
 You'll need to do a bit of fiddling to get this all working, but hopefully it's easy enough.
 
-P.S. I highly recommend using a caching tool at first, to allow you to aggressively cache the app's requests to biblegateway.com so that you don't inundate them with requests over and over again while you try to get it working. Use the relaxTransparency = yes option to always return a hit from the cache when the data is present.
+P.S. I highly recommend using a caching tool at first, to allow you to aggressively cache the app's requests to biblegateway.com so that you don't inundate them with requests over and over again while you try to get it working. I used Polipo. Use the relaxTransparency = yes option to always return a hit from the cache when the data is present.

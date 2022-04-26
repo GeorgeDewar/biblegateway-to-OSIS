@@ -109,7 +109,7 @@ public class Main {
 		
 		
 		
-		Element passage = doc.select(".passage.text-html").first();
+		Element passage = doc.select(".passage-content .text-html").first();
 		
 		// Convert div to chapter tag
 		passage.tagName("chapter")
@@ -163,36 +163,38 @@ public class Main {
 			}
 			
 			// Handle cross-references
-			for(Element crossref : verse.select(".crossreference")){
-				String linkValue = crossref.attr("value");
-				// Determine ID of content <li> in page
-				String id = linkValue.substring(linkValue.indexOf("#") + 1);
-				id = id.substring(0, id.indexOf("\""));
-				// Determine letter of footnote
-				String letter = linkValue.substring(linkValue.indexOf(">") + 1);
-				letter = letter.substring(0, letter.indexOf("<"));
-				// Transform <sup> tag into <note> tag with required attributes
-				crossref
-					.tagName("note")
-					.removeAttr("class").removeAttr("value")
-					.attr("type", "crossReference")
-					.attr("n", letter)
-					.attr("osisID", osisId + "!crossReference." + letter);
-				// Grab the cross-reference IDs from the footnote link
-				String[] refs = passage.select("#" + id).select("a").get(1).attr("data-bibleref").split(",");
-				for(int i=0; i<refs.length; i++){
-					String ref = refs[i];
-					// Turn it into a <reference> tag
-					Element refEl = createTag("reference").attr("osisRef", ref);
-					// Change the osisID notation into readable notation, with spaces and :s
-					refEl.html(ref.replaceFirst("\\.", " ").replaceFirst("\\.", ":").replaceFirst("\\.", " ").replaceFirst("\\.", ":"));
-					// Append it to the <note> element
-					crossref.appendChild(refEl);
-					// Append the semicolon which the OSIS spec dictates
-					if(i < refs.length - 1) 
-						crossref.append("; ");
-				}
-			}
+//			for(Element crossref : verse.select(".crossreference")){
+//				String linkValue = crossref.attr("value");
+//				// Determine ID of content <li> in page
+//				String id = linkValue.substring(linkValue.indexOf("#") + 1);
+//				id = id.substring(0, id.indexOf("\""));
+//				// Determine letter of footnote
+//				String letter = linkValue.substring(linkValue.indexOf(">") + 1);
+//				letter = letter.substring(0, letter.indexOf("<"));
+//				// Transform <sup> tag into <note> tag with required attributes
+//				crossref
+//					.tagName("note")
+//					.removeAttr("class").removeAttr("value")
+//					.attr("type", "crossReference")
+//					.attr("n", letter)
+//					.attr("osisID", osisId + "!crossReference." + letter);
+//				// Grab the cross-reference IDs from the footnote link
+//				String[] refs = passage.select("#" + id).select("a").get(1).attr("data-bibleref").split(",");
+//				for(int i=0; i<refs.length; i++){
+//					String ref = refs[i];
+//					// Turn it into a <reference> tag
+//					Element refEl = createTag("reference").attr("osisRef", ref);
+//					// Change the osisID notation into readable notation, with spaces and :s
+//					refEl.html(ref.replaceFirst("\\.", " ").replaceFirst("\\.", ":").replaceFirst("\\.", " ").replaceFirst("\\.", ":"));
+//					// Append it to the <note> element
+//					crossref.appendChild(refEl);
+//					// Append the semicolon which the OSIS spec dictates
+//					if(i < refs.length - 1)
+//						crossref.append("; ");
+//				}
+//			}
+
+
 		}
 		
 		// Convert poetry div to lg
@@ -213,6 +215,8 @@ public class Main {
 		
 		// Remove footnotes / cross-references sections (which have served their purpose)
 		passage.select(".footnotes, .crossrefs").remove();
+
+		System.out.println(passage.outerHtml());
 		
 		return passage;
 	}

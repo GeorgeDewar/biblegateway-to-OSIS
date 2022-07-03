@@ -14,13 +14,10 @@ import org.jsoup.select.Elements;
 
 public class Main {
 	
-	static final int NUM_BOOKS_OT = 39; //39;
-	static final int NUM_BOOKS_NT = 27; //27;
+	static final int NUM_BOOKS_OT = 39;
+	static final int NUM_BOOKS_NT = 27;
 	
-	//static final String source = "D:\\George\\Development\\BibleGateway2OSIS\\{BOOK}-{CHAPTER}-{VERSION}.html";
-	static final String source = "http://mobile.biblegateway.com/passage/?search={BOOK}%20{CHAPTER}&version={VERSION}";
-	
-	static String version = "NKJV";
+	static String version = "NASB";
 	
 	public static void main(String[] args) throws Exception{
 		
@@ -40,15 +37,16 @@ public class Main {
 		
 		// Get all the books of the old and new testament
 		Scanner bookScanner = new Scanner(new File("books.dat"));
-		Element oldTestament = getTestament(bookScanner, NUM_BOOKS_OT);
-		Element newTestament = getTestament(bookScanner, NUM_BOOKS_NT);
+		Element oldTestament = getTestament(bookScanner, 1);
+		Element newTestament = getTestament(bookScanner, 1);
 		bookScanner.close();
 		
 		// Output passage to String
 		String passageXml = (oldTestament.outerHtml() + newTestament.outerHtml())
 			.replaceAll("osisid", "osisID")
 			.replaceAll("osisref", "osisRef")
-			.replaceAll("divinename", "divineName");
+			.replaceAll("divinename", "divineName")
+			.replaceAll("transchange", "transChange");
 		
 		// Remove whitespace from before a </note> tag to fix mystery blank cross-reference in AndBible
 		passageXml = passageXml.replaceAll("</reference>[ \t\r\n]*</note>", "</reference></note>");
@@ -92,23 +90,10 @@ public class Main {
 		return bookEl;
 	}
 	
-	static Element getChapter(String book, int chapter, String version) throws IOException{
-		String url = source
-				.replace("{BOOK}", book)
-				.replace("{CHAPTER}", String.valueOf(chapter))
-				.replace("{VERSION}", version);
-		
-		Document doc;
-		
-		if(source.startsWith("http")){
-			doc = Jsoup.connect(url).get();
-		}
-		else{
-			doc = Jsoup.parse(new File(url), "UTF-8");
-		}
-		
-		
-		
+	static Element getChapter(String book, int chapter, String version) throws IOException {
+		var url = "raw_html/" + version + "/" + book + "_" + chapter + ".html";
+		var doc = Jsoup.parse(new File(url), "UTF-8");
+
 		Element passage = doc.select(".passage-content .text-html").first();
 		
 		// Convert div to chapter tag
@@ -122,7 +107,7 @@ public class Main {
 		removeComments(passage);
 		
 		// Convert small-caps span to divineName tag
-		passage.select("span.small-caps").tagName("divineName").removeAttr("class").removeAttr("style");
+		passage.select("p span.text span.small-caps").tagName("divineName").removeAttr("class").removeAttr("style");
 		
 		// Remove redundant chapter spans (used only in isolated places)
 		passage.select("span.chapter-1, span.chapter-2, span.chapter-3").unwrap();
@@ -145,9 +130,9 @@ public class Main {
 				// Determine letter of footnote
 				String letter = footnote.select("a").first().text();
 				// Transform <sup> tag into <note> tag with required attributes
-				footnote
-					.tagName("note")
-					.removeAttr("class").removeAttr("value")
+				var noteTag = createTag("note");
+				footnote.replaceWith(noteTag);
+				noteTag
 					.attr("n", letter)
 					.attr("osisRef", osisId)
 					.attr("osisID", osisId + "!" + letter);
@@ -155,44 +140,46 @@ public class Main {
 				Elements noteContent = passage.select("#" + id);
 				// The first link in a footnote is not required
 				noteContent.select("a").first().remove();
+				// The span is unnecessary
+				noteContent.select("span").unwrap();
 				// Subsequent links are to verses, and the text of these must be kept
 				noteContent.select("a").unwrap();
 				// Change italic text to correct tag
 				noteContent.select("i").tagName("hi").attr("type", "italic");
-				footnote.html(noteContent.html());
+				noteTag.html(noteContent.html());
 			}
 			
 			// Handle cross-references
-//			for(Element crossref : verse.select(".crossreference")){
-//				String linkValue = crossref.attr("value");
-//				// Determine ID of content <li> in page
-//				String id = linkValue.substring(linkValue.indexOf("#") + 1);
-//				id = id.substring(0, id.indexOf("\""));
-//				// Determine letter of footnote
-//				String letter = linkValue.substring(linkValue.indexOf(">") + 1);
-//				letter = letter.substring(0, letter.indexOf("<"));
-//				// Transform <sup> tag into <note> tag with required attributes
-//				crossref
-//					.tagName("note")
-//					.removeAttr("class").removeAttr("value")
-//					.attr("type", "crossReference")
-//					.attr("n", letter)
-//					.attr("osisID", osisId + "!crossReference." + letter);
-//				// Grab the cross-reference IDs from the footnote link
-//				String[] refs = passage.select("#" + id).select("a").get(1).attr("data-bibleref").split(",");
-//				for(int i=0; i<refs.length; i++){
-//					String ref = refs[i];
-//					// Turn it into a <reference> tag
-//					Element refEl = createTag("reference").attr("osisRef", ref);
-//					// Change the osisID notation into readable notation, with spaces and :s
-//					refEl.html(ref.replaceFirst("\\.", " ").replaceFirst("\\.", ":").replaceFirst("\\.", " ").replaceFirst("\\.", ":"));
-//					// Append it to the <note> element
-//					crossref.appendChild(refEl);
-//					// Append the semicolon which the OSIS spec dictates
-//					if(i < refs.length - 1)
-//						crossref.append("; ");
-//				}
-//			}
+			for(Element crossref : verse.select(".crossreference")){
+				var crossReferenceContent = crossref.child(0);
+
+				String linkValue = crossReferenceContent.attr("href");
+				// Determine ID of content <li> in page
+				String id = linkValue.substring(linkValue.indexOf("#") + 1);
+				// Determine letter of footnote
+				String letter = crossReferenceContent.text();
+				// Transform <sup> tag into <note> tag with required attributes
+				var noteTag = createTag("note");
+				noteTag
+					.attr("type", "crossReference")
+					.attr("n", letter)
+					.attr("osisID", osisId + "!crossReference." + letter);
+				crossref.replaceWith(noteTag);
+				// Grab the cross-reference IDs from the footnote link
+				String[] refs = passage.select("#" + id).select("a").get(1).attr("data-bibleref").split(",");
+				for(int i=0; i<refs.length; i++){
+					String ref = refs[i];
+					// Turn it into a <reference> tag
+					Element refEl = createTag("reference").attr("osisRef", ref);
+					// Change the osisID notation into readable notation, with spaces and :s
+					refEl.html(ref.replaceFirst("\\.", " ").replaceFirst("\\.", ":").replaceFirst("\\.", " ").replaceFirst("\\.", ":"));
+					// Append it to the <note> element
+					noteTag.appendChild(refEl);
+					// Append the semicolon which the OSIS spec dictates
+					if(i < refs.length - 1)
+						noteTag.append("; ");
+				}
+			}
 
 
 		}
@@ -208,7 +195,7 @@ public class Main {
 		passage.select("h3").tagName("title");
 		
 		// Convert I tags to transchange
-		passage.select("i").tagName("transchange").attr("type", "added");
+		passage.select("i").tagName("transChange").attr("type", "added");
 		
 		// Ignore words of Jesus
 		passage.select(".woj").unwrap();

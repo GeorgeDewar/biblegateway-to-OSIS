@@ -17,7 +17,7 @@ public class Main {
 	static final int NUM_BOOKS_OT = 39;
 	static final int NUM_BOOKS_NT = 27;
 	
-	static String version = "NASB";
+	static String version = "ESV";
 	
 	public static void main(String[] args) throws Exception{
 		
@@ -37,7 +37,7 @@ public class Main {
 		
 		// Get all the books of the old and new testament
 		Scanner bookScanner = new Scanner(new File("books.dat"));
-		Element oldTestament = getTestament(bookScanner, 1);
+		Element oldTestament = getTestament(bookScanner, NUM_BOOKS_OT);
 		Element newTestament = getTestament(bookScanner, 1);
 		bookScanner.close();
 		
@@ -187,12 +187,18 @@ public class Main {
 		// Convert poetry div to lg
 		passage.select("div.poetry p").tagName("lg");
 		passage.select("lg verse").wrap("<l level=\"1\"></l>");
+		passage.select("span.indent-1-breaks").remove();
+		passage.select("span.indent-1").unwrap();
 		passage.select("div.poetry").tagName("p").removeAttr("class");
 		passage.select("lg br").remove();
 		
 		// Convert h3s to titles
 		passage.select("h3 span").unwrap();
 		passage.select("h3").tagName("title");
+
+		// Convert h4s to titles (this is used in some Psalms as a kind of secondary title) and remove references
+		passage.select("h4 span").unwrap();
+		passage.select("h4").tagName("title").removeAttr("class").select("sup").remove();
 		
 		// Convert I tags to transchange
 		passage.select("i").tagName("transChange").attr("type", "added");
@@ -203,8 +209,12 @@ public class Main {
 		// Remove footnotes / cross-references sections (which have served their purpose)
 		passage.select(".footnotes, .crossrefs").remove();
 
-		System.out.println(passage.outerHtml());
-		
+		// Remove psalm-books
+		passage.select(".psalm-book").remove();
+
+		// Convert selahs
+//		passage.select("span.selah").removeAttr("class").tagName("l").attr("type", "selah");
+
 		return passage;
 	}
 	

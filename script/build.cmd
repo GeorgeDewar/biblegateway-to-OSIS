@@ -5,7 +5,7 @@ IF [%2]==[] goto usage
 
 IF NOT EXIST %1 mkdir %1
 
-sword-utilities-1.6.2\osis2mod %1 %1.xml -z -v %2
+%HOME%\code\sword-utilities-1.6.2\osis2mod %1 %1.xml -z -v %2
 goto end
 
 :usage

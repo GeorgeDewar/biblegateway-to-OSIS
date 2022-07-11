@@ -83,6 +83,6 @@ public class Fetcher {
     }
 
     public static void main(String[] args) throws Exception {
-        new Fetcher("NASB").fetch();
+        new Fetcher("ESV").fetch();
     }
 }

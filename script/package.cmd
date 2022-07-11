@@ -7,8 +7,8 @@ mkdir zip\%1\modules\texts\ztext\%1
 mkdir zip\%1\mods.d
 
 copy %1.conf zip\%1\mods.d\%1.conf
-copy %1\*.* zip\%1\modules\texts\ztext\%1\
-powershell Compress-Archive -Force zip/ESV2/* ESV2.zip
+copy sword_output\%1\*.* zip\%1\modules\texts\ztext\%1\
+powershell Compress-Archive -Force zip/%1/* sword_output/%1.zip
 
 IF "%2"=="-S" adb shell am start -S -n net.bible.android.activity/.StartupActivity
 

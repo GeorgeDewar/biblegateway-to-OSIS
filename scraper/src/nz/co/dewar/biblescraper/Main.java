@@ -52,7 +52,7 @@ public class Main {
 		passageXml = passageXml.replaceAll("</reference>[ \t\r\n]*</note>", "</reference></note>");
 		
 		// Print output to file
-		PrintStream output = new PrintStream(new File(version + ".xml"), "UTF-8");
+		PrintStream output = new PrintStream(new File("osis_output/" + version + ".xml"), "UTF-8");
 		output.print(header + passageXml + footer);
 		output.close();
 		
